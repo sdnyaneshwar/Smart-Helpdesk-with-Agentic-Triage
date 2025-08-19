@@ -5,6 +5,10 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import authRoutes from './routes/auth.js';
 import kbRoutes from './routes/kb.js';
+import ticketRoutes from './routes/tickets.js';
+import auditRoutes from './routes/audit.js';
+import configRoutes from './routes/config.js';
+
 
 
 dotenv.config();
@@ -51,7 +55,9 @@ app.get('/readyz', async (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/kb', kbRoutes);
-
+app.use('/api/tickets', ticketRoutes);
+app.use('/api/tickets', auditRoutes); // Note: /api/tickets/:id/audit
+app.use('/api/config', configRoutes);
 
 // Error handling
 app.use((err, req, res, next) => {
