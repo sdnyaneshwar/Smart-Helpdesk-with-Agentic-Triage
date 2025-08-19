@@ -4,6 +4,8 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import authRoutes from './routes/auth.js';
+import kbRoutes from './routes/kb.js';
+
 
 dotenv.config();
 
@@ -48,6 +50,8 @@ app.get('/readyz', async (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/kb', kbRoutes);
+
 
 // Error handling
 app.use((err, req, res, next) => {
