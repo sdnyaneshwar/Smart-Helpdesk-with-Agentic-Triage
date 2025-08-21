@@ -1,0 +1,31 @@
+   version: '3.8'
+   services:
+     backend:
+       build: ./server
+       ports:
+         - "8080:8080"
+       environment:
+         - MONGO_URI="mongodb+srv://dany:12345@cluster0.3e7f6pr.mongodb.net/helpdesk"
+         - JWT_SECRET=change-me-to-a-strong-secret
+         - REDIS_URI=redis://default:gkUAIMcx27U4ohmqvtmEqwKLVE3sWRFw@redis-18816.c9.us-east-1-2.ec2.redns.redis-cloud.com:18816
+         - AUTO_CLOSE_ENABLED=true
+         - PORT=8080
+         - CONFIDENCE_THRESHOLD=0.78
+         - STUB_MODE=true
+       volumes:
+         - ./server:/app
+         - /app/node_modules
+     frontend:
+       build: ./client
+       ports:
+         - "5173:5173"
+       environment:
+         - VITE_API_BASE_URL=http://backend:8080/api
+       depends_on:
+         - backend
+       volumes:
+         - ./client:/app
+         - /app/node_modules
+   volumes:
+     mongo-data:
+   
