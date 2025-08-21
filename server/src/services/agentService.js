@@ -6,19 +6,32 @@ import AgentSuggestion from '../models/agentSuggestion.js';
 import AuditLog from '../models/auditLog.js';
 import Config from '../models/config.js';
 import { OpenAI } from 'openai';
-import { parse } from 'url';
-
+import { URL } from 'url';
+import dotenv from 'dotenv';
+dotenv.config();
 // Parse REDIS_URI
-const redisUrl = parse(process.env.REDIS_URI || 'redis://localhost:6379');
+const redisUrl = new URL(process.env.REDIS_URI || 'redis://localhost:6379');
+console.log('Parsed REDIS_URI:', {
+  host: redisUrl.hostname,
+  port: redisUrl.port,
+  username: redisUrl.username,
+  password: redisUrl.password,
+});
+
 const connection = {
   host: redisUrl.hostname,
   port: parseInt(redisUrl.port),
   username: redisUrl.username || undefined,
   password: redisUrl.password || undefined,
+  // Enable TLS for Redis Cloud
+  tls: process.env.REDIS_URI.includes('rediss://') ? {} : undefined,
 };
 
 // Initialize Queue
-const queue = new Queue('triageQueue', { connection });
+const queue = new Queue('triageQueue', {
+  connection,
+  defaultJobOptions: { attempts: 3, backoff: { type: 'exponential', delay: 1000 } },
+});
 
 // Prompts (versioned)
 const PROMPT_VERSION = '1.0';
@@ -186,6 +199,6 @@ const worker = new Worker('triageQueue', async (job) => {
 // Enqueue function
 export default {
   enqueueTriage: async (ticketId, traceId) => {
-    await queue.add('triage', { ticketId, traceId }, { attempts: 3, backoff: { type: 'exponential', delay: 1000 } });
+    await queue.add('triage', { ticketId, traceId });
   },
 };

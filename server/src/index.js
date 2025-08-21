@@ -12,9 +12,9 @@ import configRoutes from './routes/config.js';
 
 
 dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 8080;
+// console.log("The redis uri is: ", process.env.REDIS_URI);
 
 // Middleware
 app.use(express.json());
